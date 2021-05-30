@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_outer_classname = "SampleProto";
+option java_package = "com.cu.proto";
+
+package com.cu.test.grpc;
+
+message SampleRequest { string userId = 1; string message = 2; }
+
+message SampleResponse { string message = 1; string test = 2; }
+
+service SampleService {
+    rpc SampleCall (SampleRequest) returns (SampleResponse) {}
+}
+

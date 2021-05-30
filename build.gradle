@@ -1,0 +1,92 @@
+
+
+buildscript {
+	repositories { mavenCentral() }
+	dependencies {
+		classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8' }
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.3.11.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'idea'
+	id 'com.google.protobuf' version '0.8.15'
+}
+
+
+group = 'com.cu'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+def grpcVersion = '1.36.0' // CURRENT_GRPC_VERSION
+def protobufVersion = '3.12.0'
+def protocVersion = protobufVersion
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+
+protobuf {
+	protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
+	plugins {
+		grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+	}
+	generateProtoTasks {
+		all()*.plugins { grpc {} }
+	}
+//	generatedFilesBaseDir = "$projectDir/gen"
+}
+
+clean {
+	delete protobuf.generatedFilesBaseDir
+}
+
+// Inform IDEs like IntelliJ IDEA, Eclipse or NetBeans about the generated code.
+sourceSets {
+	main {
+		java {
+			srcDirs 'build/generated/source/proto/main/grpc'
+			srcDirs 'build/generated/source/proto/main/java'
+		}
+	}
+}
+
+dependencies {
+//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+//	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// https://mvnrepository.com/artifact/org.json/json
+	implementation group: 'org.json', name: 'json', version: '20210307'
+
+
+	//grpc
+	implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+	implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+	implementation "io.grpc:grpc-stub:${grpcVersion}"
+	compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+}
+//
+//idea {
+//	module {
+//		// proto files and generated Java files are automatically added as
+//		// source dirs.
+//		// If you have additional sources, add them here:
+//		sourceDirs += file("/path/to/other/sources");
+//	}
+//}
+
+test {
+	useJUnitPlatform()
+}
